@@ -1,14 +1,19 @@
 package game
 
 type Game struct {
-	Board [8][8]*Piece `json:"board"`
-	Turn  Color        `json:"turn"`
+	ID      string           `json:"id"`
+	Board   [8][8]*Piece     `json:"board"`
+	Turn    Color            `json:"turn"`
+	History []Move           `json:"history"`
+	Players map[Color]string `json:"players"`
 }
 
 func NewGame() *Game {
 	game := &Game{
-		Board: [8][8]*Piece{},
-		Turn:  White,
+		Board:   [8][8]*Piece{},
+		Turn:    White,
+		History: []Move{},
+		Players: make(map[Color]string),
 	}
 
 	game.initBoard()

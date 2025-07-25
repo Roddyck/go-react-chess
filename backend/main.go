@@ -21,7 +21,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello, World!"))
 	})
-	mux.HandleFunc("api/game", HandleGame)
+	mux.HandleFunc("/api/games", HandleGame)
 
 	httpServer := http.Server{
 		Addr:    ":8080",
