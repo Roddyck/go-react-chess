@@ -8,12 +8,17 @@ export type PieceType =
   | "queen"
   | "king";
 
-export interface Piece {
+export type Piece = {
   type: PieceType;
   color: Color;
 }
 
-export interface Game {
+export type Positoin = {
+  x: number;
+  y: number;
+}
+
+export type Game = {
   board: (Piece | null)[][];
   turn: Color;
 }

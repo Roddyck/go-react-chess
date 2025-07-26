@@ -1,39 +1,19 @@
-import type { Piece } from "./chess";
+import type { Piece, Position } from "./chess";
+import { PieceSVG } from "./pieces";
 
 interface SquareProps {
   piece: Piece | null;
+  position: Position;
   isLight: boolean;
 }
 
-function Square({ piece, isLight }: SquareProps) {
-  const getPieceSymbol = () => {
-    if (!piece) return null;
+function getSquareColor(isLight: boolean) {
+  return isLight ? "bg-amber-100" : "bg-amber-800";
+}
 
-    const symbols = {
-      white: {
-        king: "♔",
-        queen: "♕",
-        rook: "♖",
-        bishop: "♗",
-        knight: "♘",
-        pawn: "♙",
-      },
-      black: {
-        king: "♚",
-        queen: "♛",
-        rook: "♜",
-        bishop: "♝",
-        knight: "♞",
-        pawn: "♟",
-      },
-    };
-
-    return symbols[piece.color][piece.type];
-  };
-
-  const getSquareColor = () => {
-    return isLight ? "bg-amber-100" : "bg-amber-800";
-  };
+function Square({ piece, position, isLight }: SquareProps) {
+  const getFile = (x: number) => String.fromCharCode(97 + x);
+  const getRank = (y: number) => 8 - y;
 
   return (
     <div
@@ -41,20 +21,26 @@ function Square({ piece, isLight }: SquareProps) {
         w-14 h-14 md:w-16 md:h-16
         flex justify-center items-center
         relative cursor-pointer
-        ${getSquareColor()}
+        ${getSquareColor(isLight)}
         hover:opacity-80
         select-none
     `}
     >
-      {piece && (
+      {(position.y === 7 || position.x === 0) && (
         <div
-          className={`
-            text-3xl md:text-4xl
-            ${piece.color === "white" ? "text-white" : "text-black"}
-            ${piece.color === "white" ? "drop-shadow-md" : "drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"}
-          `}
+          className={`absolute top-1 left-1 text-xs ${isLight ? "text-amber-800" : "text-amber-100"}`}
         >
-          {getPieceSymbol()}
+          {position.y === 7 && getFile(position.x)}
+          {position.x === 0 && getRank(position.y)}
+        </div>
+      )}
+
+      {piece && (
+        <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+          <PieceSVG
+            type={piece.type}
+            color={piece.color}
+          />
         </div>
       )}
     </div>
