@@ -23,14 +23,14 @@ func NewGame() *Game {
 
 func (g *Game) initBoard() {
 	for x := range 8 {
-		g.Board[1][x] = &Piece{Type: Pawn, Color: White}
-		g.Board[6][x] = &Piece{Type: Pawn, Color: Black}
+		g.Board[1][x] = &Piece{Type: Pawn, Color: Black}
+		g.Board[6][x] = &Piece{Type: Pawn, Color: White}
 	}
 
 	pieces := []PieceType{Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook}
 
 	for x, piece := range pieces {
-		g.Board[0][x] = &Piece{Type: piece, Color: White}
-		g.Board[7][x] = &Piece{Type: piece, Color: Black}
+		g.Board[0][x] = &Piece{Type: piece, Color: Black}
+		g.Board[7][x] = &Piece{Type: piece, Color: White}
 	}
 }
