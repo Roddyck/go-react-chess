@@ -6,11 +6,13 @@ import (
 )
 
 type apiConfig struct {
-	db *database.Queries
+	db          *database.Queries
+	TokenSecret string
 }
 
-func New(dbQuires *database.Queries) *apiConfig {
+func New(dbQuires *database.Queries, tokenSecret string) *apiConfig {
 	return &apiConfig{
-		db: dbQuires,
+		db:          dbQuires,
+		TokenSecret: tokenSecret,
 	}
 }

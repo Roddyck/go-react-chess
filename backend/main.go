@@ -16,18 +16,18 @@ import (
 func main() {
 	godotenv.Load()
 
-	port := os.Getenv("PORT")
-
 	dbURL := os.Getenv("DB_URL")
-
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Printf("error opening database: %v", err)
 	}
 
+	port := os.Getenv("PORT")
+	tokenSecret := os.Getenv("TOKEN_SECRET")
+
 	dbQueries := database.New(db)
 
-	cfg := api.New(dbQueries)
+	cfg := api.New(dbQueries, tokenSecret)
 
 	mux := http.NewServeMux()
 
@@ -36,19 +36,19 @@ func main() {
 		middleware.AllowCors,
 	)
 
+	httpServer := http.Server{
+		Addr:    ":" + port,
+		Handler: stack(mux),
+	}
+
 	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello, World!"))
 	})
 	mux.HandleFunc("GET /api/games", api.HandleGame)
 	mux.HandleFunc("POST /api/users", cfg.HandlerCreateUser)
-
-	httpServer := http.Server{
-		Addr:    ":" + port,
-		Handler: stack(mux),
-	}
+	mux.HandleFunc("POST /api/login", cfg.HandlerLogin)
 
 	log.Println("Listening on port", port)
 	log.Fatal(httpServer.ListenAndServe())
 }
-

@@ -2,7 +2,10 @@ package auth
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,4 +25,48 @@ func CheckPasswordHash(password, hash string) error {
 	}
 
 	return nil
+}
+
+func MakeJWT(
+	userID uuid.UUID,
+	tokenSecret string,
+	expiresIn time.Duration,
+) (string, error) {
+	claims := jwt.RegisteredClaims{
+		Issuer:    "go-react-chess",
+		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresIn).UTC()),
+		Subject:   userID.String(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenSigned, err := token.SignedString([]byte(tokenSecret))
+	if err != nil {
+		return "", fmt.Errorf("error signing token: %w", err)
+	}
+
+	return tokenSigned, nil
+}
+
+func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&jwt.RegisteredClaims{},
+		func(token *jwt.Token) (any, error) {
+			return []byte(tokenSecret), nil
+		})
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("error parsing token: %w", err)
+	}
+
+	stringID, err := token.Claims.GetSubject()
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("error getting subject from token: %w", err)
+	}
+
+	id, err := uuid.Parse(stringID)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("error parsing user id: %w", err)
+	}
+
+	return id, nil
 }
