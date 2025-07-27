@@ -13,7 +13,7 @@ export type Piece = {
   color: Color;
 }
 
-export type Positoin = {
+export type Position = {
   x: number;
   y: number;
 }
