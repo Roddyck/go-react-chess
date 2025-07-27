@@ -1,7 +1,9 @@
 package game
 
+import "github.com/google/uuid"
+
 type Game struct {
-	ID      string           `json:"id"`
+	ID      uuid.UUID        `json:"id"`
 	Board   [8][8]Piece      `json:"board"`
 	Turn    Color            `json:"turn"`
 	History []Move           `json:"history"`

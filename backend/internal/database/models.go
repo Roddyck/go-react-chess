@@ -5,10 +5,19 @@
 package database
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type Game struct {
+	ID      uuid.UUID
+	Board   json.RawMessage
+	Turn    string
+	History json.RawMessage
+	Players json.RawMessage
+}
 
 type User struct {
 	ID             uuid.UUID

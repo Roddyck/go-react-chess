@@ -1,8 +1,8 @@
 package game
 
 type QueenPiece struct {
-	Type PieceType `json:"type"`
-	Color Color    `json:"color"`
+	Type  PieceType `json:"type"`
+	Color Color     `json:"color"`
 }
 
 func (q *QueenPiece) GetType() PieceType {
