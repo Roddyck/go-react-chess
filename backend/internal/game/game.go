@@ -2,7 +2,7 @@ package game
 
 type Game struct {
 	ID      string           `json:"id"`
-	Board   [8][8]*Piece     `json:"board"`
+	Board   [8][8]Piece      `json:"board"`
 	Turn    Color            `json:"turn"`
 	History []Move           `json:"history"`
 	Players map[Color]string `json:"players"`
@@ -10,7 +10,7 @@ type Game struct {
 
 func NewGame() *Game {
 	game := &Game{
-		Board:   [8][8]*Piece{},
+		Board:   [8][8]Piece{},
 		Turn:    White,
 		History: []Move{},
 		Players: make(map[Color]string),
@@ -22,15 +22,16 @@ func NewGame() *Game {
 }
 
 func (g *Game) initBoard() {
+	// black pieces at the top and white pieces at the bottom
 	for x := range 8 {
-		g.Board[1][x] = &Piece{Type: Pawn, Color: Black}
-		g.Board[6][x] = &Piece{Type: Pawn, Color: White}
+		g.Board[1][x] = NewPiece(Pawn, Black)
+		g.Board[6][x] = NewPiece(Pawn, White)
 	}
 
 	pieces := []PieceType{Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook}
 
 	for x, piece := range pieces {
-		g.Board[0][x] = &Piece{Type: piece, Color: Black}
-		g.Board[7][x] = &Piece{Type: piece, Color: White}
+		g.Board[0][x] = NewPiece(piece, Black)
+		g.Board[7][x] = NewPiece(piece, White)
 	}
 }

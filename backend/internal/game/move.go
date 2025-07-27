@@ -1,11 +1,11 @@
 package game
 
-type Positoin struct {
+type Position struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 }
 
 type Move struct {
-	From Positoin `json:"from"`
-	To   Positoin `json:"to"`
+	From Position `json:"from"`
+	To   Position `json:"to"`
 }
