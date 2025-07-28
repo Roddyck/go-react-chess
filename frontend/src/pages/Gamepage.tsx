@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { ChessBoard } from "./ChessBoard";
-import type { Game } from "./chess";
+import { useEffect, useState } from "react";
+import { ChessBoard } from "../components/ChessBoard";
+import type { Game } from "../components/chess";
 
-function Home() {
+function GamePage() {
   const [game, setGame] = useState<Game | null>(null);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function Home() {
     fetchGame();
   }, []);
 
-  if (!game) return <div>Loading...</div>;
+  if (!game) return <div>WTF...</div>;
 
   return (
     <div>
@@ -29,4 +29,4 @@ function Home() {
   );
 }
 
-export { Home };
+export { GamePage };

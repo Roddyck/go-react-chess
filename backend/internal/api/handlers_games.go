@@ -6,9 +6,16 @@ import (
 
 	"github.com/Roddyck/go-react-chess/backend/internal/database"
 	"github.com/Roddyck/go-react-chess/backend/internal/game"
+	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) HandlerCreateGame(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value("userID").(uuid.UUID)
+	if !ok {
+		respondWithError(w, http.StatusInternalServerError, "user id not found in context", nil)
+		return
+	}
+
 	g := game.NewGame()
 
 	board, err := json.Marshal(g.Board)
@@ -16,6 +23,8 @@ func (cfg *apiConfig) HandlerCreateGame(w http.ResponseWriter, r *http.Request) 
 		respondWithError(w, http.StatusInternalServerError, "error marshalling board", err)
 		return
 	}
+
+	g.Players[game.White] = userID
 
 	history, _ := json.Marshal(g.History)
 	players, _ := json.Marshal(g.Players)

@@ -3,11 +3,11 @@ package game
 import "github.com/google/uuid"
 
 type Game struct {
-	ID      uuid.UUID        `json:"id"`
-	Board   [8][8]Piece      `json:"board"`
-	Turn    Color            `json:"turn"`
-	History []Move           `json:"history"`
-	Players map[Color]string `json:"players"`
+	ID      uuid.UUID           `json:"id"`
+	Board   [8][8]Piece         `json:"board"`
+	Turn    Color               `json:"turn"`
+	History []Move              `json:"history"`
+	Players map[Color]uuid.UUID `json:"players"`
 }
 
 func NewGame() *Game {
@@ -15,7 +15,7 @@ func NewGame() *Game {
 		Board:   [8][8]Piece{},
 		Turn:    White,
 		History: []Move{},
-		Players: make(map[Color]string),
+		Players: make(map[Color]uuid.UUID),
 	}
 
 	game.initBoard()
