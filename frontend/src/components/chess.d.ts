@@ -19,6 +19,7 @@ export type Position = {
 }
 
 export type Game = {
+  ID: string;
   board: (Piece | null)[][];
   turn: Color;
 }

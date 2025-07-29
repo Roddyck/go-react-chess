@@ -4,7 +4,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
-import { GamePage } from "./pages/Gamepage";
+import { GamePage } from "./pages/GamePage";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Home />} />
-            <Route path="/game" element={<GamePage />} />
+            <Route path="/session/:sessionID" element={<GamePage />} />
           </Route>
         </Routes>
       </AuthProvider>

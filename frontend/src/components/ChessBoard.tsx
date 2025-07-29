@@ -13,7 +13,6 @@ function ChessBoard({ game }: ChessBoardProps) {
         <div key={y} style={{ display: "flex" }}>
           {row.map((piece, x) => {
             const isLight = (x + y) % 2 === 0;
-            console.log(x, y, piece?.color);
             return (
               <Square
                 key={`${x}-${y}`}

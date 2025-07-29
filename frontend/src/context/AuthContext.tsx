@@ -1,6 +1,7 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import type { User, AuthContextType } from "./types";
 import { useNavigate } from "react-router";
+import { API_URL } from "../api/chessApi";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -9,7 +10,40 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token")
   );
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      if (token) {
+        try {
+          const response = await fetch(`${API_URL}/api/users`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+          if (response.status !== 200) {
+            localStorage.removeItem("token");
+            setToken(null);
+            setUser(null);
+            navigate("/login");
+          }
+
+          setUser(data);
+        } catch (error) {
+          localStorage.removeItem("token");
+          setToken(null);
+          setUser(null);
+          navigate("/login");
+        }
+      }
+      setLoading(false);
+    };
+
+    loadUser();
+  }, [token]);
 
   const login = async (email: string, password: string) => {
     const response = await fetch("http://localhost:8080/api/login", {
@@ -21,7 +55,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const data = await response.json();
-    console.log(data);
 
     if (response.status !== 200) {
       console.error(data);
@@ -29,9 +62,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data);
-    console.log(user);
     setToken(data.access_token);
-    console.log(token);
     localStorage.setItem("token", data.access_token);
     navigate("/");
   };
@@ -52,7 +83,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data);
-    console.log(user);
     setToken(data.access_token);
     localStorage.setItem("token", data.access_token);
 
@@ -75,7 +105,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         isAuthenticated: !!user,
-        loading: !token,
+        loading,
       }}
     >
       {children}

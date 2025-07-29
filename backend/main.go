@@ -8,6 +8,7 @@ import (
 
 	"github.com/Roddyck/go-react-chess/backend/internal/api"
 	"github.com/Roddyck/go-react-chess/backend/internal/database"
+	"github.com/Roddyck/go-react-chess/backend/internal/ws"
 	"github.com/Roddyck/go-react-chess/backend/middleware"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -29,6 +30,10 @@ func main() {
 
 	cfg := api.New(dbQueries, tokenSecret)
 
+	hub := ws.NewHub()
+	wsHandler := ws.NewHandler(hub)
+	go hub.Run()
+
 	mux := http.NewServeMux()
 
 	stack := middleware.CreateStack(
@@ -45,9 +50,13 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello, World!"))
 	})
-	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerCreateGame))
 	mux.HandleFunc("POST /api/users", cfg.HandlerCreateUser)
+	mux.HandleFunc("GET /api/users", cfg.AuthMiddleware(cfg.GetUser))
+	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerCreateGame))
 	mux.HandleFunc("POST /api/login", cfg.HandlerLogin)
+
+	mux.HandleFunc("/ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
+	mux.HandleFunc("/ws/sessions/{id}", wsHandler.JoinSession)
 
 	log.Println("Listening on port", port)
 	log.Fatal(httpServer.ListenAndServe())

@@ -58,6 +58,23 @@ func (cfg *apiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+func (cfg *apiConfig) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(uuid.UUID)
+
+	user, err := cfg.db.GetUserByID(r.Context(), userID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error getting user", err)
+	}
+
+	respondWithJSON(w, http.StatusOK, User{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt.UTC(),
+		UpdatedAt: user.UpdatedAt.UTC(),
+		Name:      user.Name,
+		Email:     user.Email,
+	})
+}
+
 func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	type credentials struct {
 		Email    string `json:"email"`
