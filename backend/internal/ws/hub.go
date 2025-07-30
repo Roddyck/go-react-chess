@@ -42,7 +42,7 @@ func (h *Hub) Run() {
 			if _, ok := h.Sessions[player.SessionID]; ok {
 				s := h.Sessions[player.SessionID]
 
-				if _, ok := s.Players[player.ID]; ok {
+				if _, ok := s.Players[player.ID]; !ok {
 					s.Players[player.ID] = player
 				}
 			}
