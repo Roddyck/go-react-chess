@@ -10,19 +10,28 @@ function GamePage() {
   const [gameID, setGameID] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const { token } = useAuth();
+  const { user } = useAuth();
 
   const { sendMessage } = useWebSocket(
-    `ws://localhost:8080/ws/sessions/${sessionID}`,
-    (data) => {
-      console.log(data);
-      setGameID(data.game_id);
-      console.log(data.game_id);
+    `ws://localhost:8080/ws/sessions/${sessionID}?userID=${user?.id}&username=${user?.name}`,
+    (msg) => {
+      if (!msg) {
+        console.error("No message");
+      }
+      console.log(msg);
+      setGameID(msg.data.game_id);
+      console.log(msg.data.game_id);
     }
   );
 
   const sendHello = () => {
     console.log("Sending hello");
-    sendMessage({ action: "hello", session_id: sessionID, data: {} });
+
+    if (sessionID) {
+      sendMessage({ action: "hello", session_id: sessionID, data: {msg: "Hello, World!"} });
+    } else {
+      console.error("No session ID");
+    }
   };
 
   useEffect(() => {

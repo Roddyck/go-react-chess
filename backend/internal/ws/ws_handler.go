@@ -53,6 +53,27 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
+	type responseParams struct {
+		IDs []uuid.UUID `json:"ids"`
+	}
+	sessions := h.hub.Sessions
+
+	var response responseParams
+	for _, session := range sessions {
+		response.IDs = append(response.IDs, session.ID)
+	}
+
+	data, err := json.Marshal(response)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("error marshalling session", err)
+		return
+	}
+
+	w.Write(data)
+}
+
 func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -60,10 +81,11 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	roomID := r.PathValue("roomID")
+	log.Println("roomID", roomID)
 	username := r.URL.Query().Get("username")
 	userID := r.URL.Query().Get("userID")
+	log.Println("userID", userID)
 
 	userUUID, err := uuid.Parse(userID)
 	if err != nil {
@@ -79,7 +101,7 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 
 	player := &Player{
 		Conn:      conn,
-		Message:   make(chan *Message),
+		Message:   make(chan *Message, 10),
 		ID:        userUUID,
 		SessionID: sessionID,
 		Name:      username,
@@ -88,15 +110,12 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 	message := &Message{
 		Action:    "player_joined",
 		SessionID: player.SessionID,
-		Data: map[string]any{
-			"msg": "Player joined the game",
-			"game_id": h.hub.Sessions[sessionID].Game.ID,
-		},
+		Data: map[string]any{},
 	}
 
 	h.hub.Register <- player
 	h.hub.Broadcast <- message
 
 	go player.writeMessage()
-	go player.readMessage(h.hub)
+	player.readMessage(h.hub)
 }

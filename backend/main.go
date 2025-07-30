@@ -55,8 +55,10 @@ func main() {
 	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerCreateGame))
 	mux.HandleFunc("POST /api/login", cfg.HandlerLogin)
 
-	mux.HandleFunc("/ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
-	mux.HandleFunc("/ws/sessions/{id}", wsHandler.JoinSession)
+	mux.HandleFunc("POST /ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
+
+	mux.HandleFunc("GET /ws/sessions", wsHandler.GetSessions)
+	mux.HandleFunc("/ws/sessions/{roomID}", wsHandler.JoinSession)
 
 	log.Println("Listening on port", port)
 	log.Fatal(httpServer.ListenAndServe())
