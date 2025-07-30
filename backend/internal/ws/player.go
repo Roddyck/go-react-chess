@@ -1,7 +1,7 @@
 package ws
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"log"
 
 	"github.com/google/uuid"
@@ -44,7 +44,7 @@ func (p *Player) readMessage(hub *Hub) {
 	}()
 
 	for {
-		_, _, err := p.Conn.ReadMessage()
+		_, message, err := p.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(
 				err,
@@ -53,14 +53,16 @@ func (p *Player) readMessage(hub *Hub) {
 			) {
 				log.Printf("error: %v", err)
 			}
+			break
 		}
 
-		msg := &Message{
-			Action:    "player_joined",
-			SessionID: p.SessionID,
-			Data: map[string]any{},
+		msg := Message{}
+		err = json.Unmarshal(message, &msg)
+		if err != nil {
+			log.Println("error unmarshalling message: ", err)
+			return
 		}
 
-		hub.Broadcast <- msg
+		hub.Broadcast <- &msg
 	}
 }

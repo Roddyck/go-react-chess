@@ -6,13 +6,14 @@ import (
 
 	"github.com/Roddyck/go-react-chess/backend/internal/database"
 	"github.com/Roddyck/go-react-chess/backend/internal/game"
+	"github.com/Roddyck/go-react-chess/backend/util"
 	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) HandlerCreateGame(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value("userID").(uuid.UUID)
 	if !ok {
-		respondWithError(w, http.StatusInternalServerError, "user id not found in context", nil)
+		util.RespondWithError(w, http.StatusInternalServerError, "user id not found in context", nil)
 		return
 	}
 
@@ -20,7 +21,7 @@ func (cfg *apiConfig) HandlerCreateGame(w http.ResponseWriter, r *http.Request) 
 
 	board, err := json.Marshal(g.Board)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "error marshalling board", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling board", err)
 		return
 	}
 
@@ -35,11 +36,11 @@ func (cfg *apiConfig) HandlerCreateGame(w http.ResponseWriter, r *http.Request) 
 		Players: players,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "error creating game", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "error creating game", err)
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, game.Game{
+	util.RespondWithJSON(w, http.StatusCreated, game.Game{
 		ID:      dbGame.ID,
 		Board:   g.Board,
 		Turn:    g.Turn,

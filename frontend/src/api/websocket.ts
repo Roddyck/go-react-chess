@@ -59,10 +59,10 @@ function useWebSocket(url: string, onMessage: (msg: Message) => void) {
     };
   }, [url]);
 
-  const sendMessage = (message: Message) => {
+  const sendMessage = (message: string) => {
     if (isConnected && ws.current) {
       try {
-        ws.current.send(JSON.stringify(message));
+        ws.current.send(message);
       } catch (error) {
         console.error("Error sending message", error);
       }

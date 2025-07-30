@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Roddyck/go-react-chess/backend/util"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -33,8 +34,7 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	params := parameters{}
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println("error decoding request", err)
+		util.RespondWithError(w, http.StatusBadRequest, "error decoding request body", err)
 		return
 	}
 
@@ -45,8 +45,7 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(params)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("error marshalling session", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling response", err)
 		return
 	}
 
@@ -66,8 +65,7 @@ func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(response)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("error marshalling session", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling response", err)
 		return
 	}
 
@@ -75,27 +73,30 @@ func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("error upgrading connection", err)
-		return
-	}
-
 	roomID := r.PathValue("roomID")
-	log.Println("roomID", roomID)
 	username := r.URL.Query().Get("username")
 	userID := r.URL.Query().Get("userID")
-	log.Println("userID", userID)
 
 	userUUID, err := uuid.Parse(userID)
 	if err != nil {
-		log.Println("error parsing user id", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "user id not found in context", nil)
 		return
 	}
 
 	sessionID, err := uuid.Parse(roomID)
 	if err != nil {
-		log.Println("error parsing session id", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "session id not found in context", nil)
+		return
+	}
+
+	if len(h.hub.Sessions[sessionID].Players) == 2 {
+		util.RespondWithError(w, http.StatusBadRequest, "session is full", nil)
+		return
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("error upgrading connection", err)
 		return
 	}
 
@@ -110,7 +111,7 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 	message := &Message{
 		Action:    "player_joined",
 		SessionID: player.SessionID,
-		Data: map[string]any{},
+		Data:      make(map[string]any),
 	}
 
 	h.hub.Register <- player

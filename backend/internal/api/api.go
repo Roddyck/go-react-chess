@@ -6,6 +6,7 @@ import (
 
 	"github.com/Roddyck/go-react-chess/backend/internal/auth"
 	"github.com/Roddyck/go-react-chess/backend/internal/database"
+	"github.com/Roddyck/go-react-chess/backend/util"
 	_ "github.com/lib/pq"
 )
 
@@ -25,13 +26,13 @@ func (cfg *apiConfig) AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := auth.GetBearerToken(r.Header)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Access token is missing from request headers", err)
+			util.RespondWithError(w, http.StatusUnauthorized, "Access token is missing from request headers", err)
 			return
 		}
 
 		userID, err := auth.ValidateJWT(token, cfg.TokenSecret)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Invalid access token", err)
+			util.RespondWithError(w, http.StatusUnauthorized, "Invalid access token", err)
 		}
 
 		ctx := context.WithValue(r.Context(), "userID", userID)

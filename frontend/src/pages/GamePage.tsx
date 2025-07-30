@@ -28,7 +28,11 @@ function GamePage() {
     console.log("Sending hello");
 
     if (sessionID) {
-      sendMessage({ action: "hello", session_id: sessionID, data: {msg: "Hello, World!"} });
+      sendMessage(JSON.stringify({
+        action: "hello",
+        session_id: sessionID,
+        data: { msg: "Hello, World!" },
+      }));
     } else {
       console.error("No session ID");
     }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/Roddyck/go-react-chess/backend/internal/auth"
 	"github.com/Roddyck/go-react-chess/backend/internal/database"
+	"github.com/Roddyck/go-react-chess/backend/util"
 	"github.com/google/uuid"
 )
 
@@ -28,13 +29,13 @@ func (cfg *apiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 	creds := credentials{}
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Error decoding request body", err)
+		util.RespondWithError(w, http.StatusBadRequest, "Error decoding request body", err)
 		return
 	}
 
 	hash, err := auth.HashPassword(creds.Password)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Error hashing password", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "Error hashing password", err)
 		return
 	}
 
@@ -45,11 +46,11 @@ func (cfg *apiConfig) HandlerCreateUser(w http.ResponseWriter, r *http.Request) 
 	})
 
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Error creating user", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "Error creating user", err)
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, User{
+	util.RespondWithJSON(w, http.StatusOK, User{
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt.UTC(),
 		UpdatedAt: user.UpdatedAt.UTC(),
@@ -63,10 +64,10 @@ func (cfg *apiConfig) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := cfg.db.GetUserByID(r.Context(), userID)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Error getting user", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "Error getting user", err)
 	}
 
-	respondWithJSON(w, http.StatusOK, User{
+	util.RespondWithJSON(w, http.StatusOK, User{
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt.UTC(),
 		UpdatedAt: user.UpdatedAt.UTC(),
@@ -89,29 +90,29 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	creds := credentials{}
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Error decoding request body", err)
+		util.RespondWithError(w, http.StatusBadRequest, "Error decoding request body", err)
 		return
 	}
 
 	user, err := cfg.db.GetUserByEmail(r.Context(), creds.Email)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
+		util.RespondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
 		return
 	}
 
 	err = auth.CheckPasswordHash(creds.Password, user.HashedPassword)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
+		util.RespondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
 		return
 	}
 
 	accessToken, err := auth.MakeJWT(user.ID, cfg.TokenSecret, time.Hour)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Error creating access token", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "Error creating access token", err)
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, loginResponse{
+	util.RespondWithJSON(w, http.StatusOK, loginResponse{
 		User: User{
 			ID:        user.ID,
 			CreatedAt: user.CreatedAt.UTC(),
