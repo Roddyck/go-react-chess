@@ -1,7 +1,7 @@
 package ws
 
 import (
-	"github.com/Roddyck/go-react-chess/backend/internal/game"
+	"github.com/Roddyck/go-react-chess/internal/game"
 	"github.com/google/uuid"
 )
 

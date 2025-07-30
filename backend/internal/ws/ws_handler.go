@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Roddyck/go-react-chess/backend/util"
+	"github.com/Roddyck/go-react-chess/util"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )

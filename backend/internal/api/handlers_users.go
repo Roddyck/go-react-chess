@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Roddyck/go-react-chess/backend/internal/auth"
-	"github.com/Roddyck/go-react-chess/backend/internal/database"
-	"github.com/Roddyck/go-react-chess/backend/util"
+	"github.com/Roddyck/go-react-chess/internal/auth"
+	"github.com/Roddyck/go-react-chess/internal/database"
+	"github.com/Roddyck/go-react-chess/util"
 	"github.com/google/uuid"
 )
 

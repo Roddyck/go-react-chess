@@ -29,15 +29,5 @@ func RespondWithError(w http.ResponseWriter, code int, message string, err error
 		Error: fmt.Sprintf("%s: %v", message, err),
 	}
 
-	data, err := json.Marshal(resp)
-	if err != nil {
-		log.Printf("Error marshalling error payload: %v", err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	_, err = w.Write(data)
-	if err != nil {
-		log.Printf("Error writing error payload: %v", err)
-	}
+	RespondWithJSON(w, code, resp)
 }

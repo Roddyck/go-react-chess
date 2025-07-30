@@ -6,16 +6,16 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY ./backend ./backend
+COPY . .
 
-RUN go build -o ./backend/chess-backend ./backend 
+RUN go build -o ./chess-backend ./
 
 FROM alpine:3.18
 
 WORKDIR /app
 
-COPY --from=builder /app/backend/chess-backend .
-COPY --from=builder /app/backend/.env .
+COPY --from=builder /app/chess-backend ./
+COPY --from=builder /app/.env ./
 
 EXPOSE 8080
 

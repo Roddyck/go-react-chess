@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Roddyck/go-react-chess/backend/internal/api"
-	"github.com/Roddyck/go-react-chess/backend/internal/database"
-	"github.com/Roddyck/go-react-chess/backend/internal/ws"
-	"github.com/Roddyck/go-react-chess/backend/middleware"
+	"github.com/Roddyck/go-react-chess/internal/api"
+	"github.com/Roddyck/go-react-chess/internal/database"
+	"github.com/Roddyck/go-react-chess/internal/ws"
+	"github.com/Roddyck/go-react-chess/middleware"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -32,7 +32,6 @@ func main() {
 
 	hub := ws.NewHub()
 	wsHandler := ws.NewHandler(hub)
-	go hub.Run()
 
 	mux := http.NewServeMux()
 
@@ -52,13 +51,15 @@ func main() {
 	})
 	mux.HandleFunc("POST /api/users", cfg.HandlerCreateUser)
 	mux.HandleFunc("GET /api/users", cfg.AuthMiddleware(cfg.GetUser))
-	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerCreateGame))
+	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerGetGame))
 	mux.HandleFunc("POST /api/login", cfg.HandlerLogin)
 
 	mux.HandleFunc("POST /ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
 
 	mux.HandleFunc("GET /ws/sessions", wsHandler.GetSessions)
 	mux.HandleFunc("/ws/sessions/{roomID}", wsHandler.JoinSession)
+
+	go hub.Run()
 
 	log.Println("Listening on port", port)
 	log.Fatal(httpServer.ListenAndServe())
