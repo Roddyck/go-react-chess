@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Roddyck/go-react-chess/internal/database"
+	"github.com/Roddyck/go-react-chess/internal/game"
 	"github.com/Roddyck/go-react-chess/util"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -38,38 +40,56 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userID := r.Context().Value("userID").(uuid.UUID)
+
 	session := InitSession(params.ID)
 	h.hub.Sessions[params.ID] = session
+	session.Game.Players[game.White] = userID
 
-	w.WriteHeader(http.StatusOK)
-
-	data, err := json.Marshal(params)
+	board, err := json.Marshal(session.Game.Board)
 	if err != nil {
-		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling response", err)
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling board", err)
+		return
+	}
+	history, err := json.Marshal(session.Game.History)
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling history", err)
+		return
+	}
+	players, err := json.Marshal(session.Game.Players)
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling players", err)
 		return
 	}
 
-	w.Write(data)
+	g, err := h.hub.db.CreateGame(r.Context(), database.CreateGameParams{
+		Board:   board,
+		Turn:    string(session.Game.Turn),
+		History: history,
+		Players: players,
+	})
+
+	h.hub.Sessions[session.ID].Game.ID = g.ID
+
+	util.RespondWithJSON(w, http.StatusCreated, params)
 }
 
 func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 	type responseParams struct {
-		IDs []uuid.UUID `json:"ids"`
+		SessionID string `json:"session_id"`
+		GameID    string `json:"game_id"`
 	}
 	sessions := h.hub.Sessions
 
-	var response responseParams
-	for _, session := range sessions {
-		response.IDs = append(response.IDs, session.ID)
+	var response []responseParams
+	for sessionID, session := range sessions {
+		response = append(response, responseParams{
+			SessionID: sessionID.String(),
+			GameID:    session.Game.ID.String(),
+		})
 	}
 
-	data, err := json.Marshal(response)
-	if err != nil {
-		util.RespondWithError(w, http.StatusInternalServerError, "error marshalling response", err)
-		return
-	}
-
-	w.Write(data)
+	util.RespondWithJSON(w, http.StatusOK, response)
 }
 
 func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +131,9 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 	message := &Message{
 		Action:    "player_joined",
 		SessionID: player.SessionID,
-		Data:      make(map[string]any),
+		Data: map[string]any{
+			"game": h.hub.Sessions[sessionID].Game,
+		},
 	}
 
 	h.hub.Register <- player

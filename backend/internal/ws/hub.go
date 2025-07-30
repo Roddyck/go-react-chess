@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"github.com/Roddyck/go-react-chess/internal/database"
 	"github.com/Roddyck/go-react-chess/internal/game"
 	"github.com/google/uuid"
 )
@@ -16,6 +17,7 @@ type Hub struct {
 	Register   chan *Player
 	Unregister chan *Player
 	Broadcast  chan *Message
+	db         *database.Queries
 }
 
 func InitSession(sessionID uuid.UUID) *Session {
@@ -26,12 +28,13 @@ func InitSession(sessionID uuid.UUID) *Session {
 	}
 }
 
-func NewHub() *Hub {
+func NewHub(dbQueries *database.Queries) *Hub {
 	return &Hub{
 		Sessions:   make(map[uuid.UUID]*Session),
 		Register:   make(chan *Player),
 		Unregister: make(chan *Player),
 		Broadcast:  make(chan *Message),
+		db:         dbQueries,
 	}
 }
 
@@ -55,6 +58,7 @@ func (h *Hub) Run() {
 							SessionID: player.SessionID,
 							Data: map[string]any{
 								"msg": "Player left the game",
+								"game": h.Sessions[player.SessionID].Game,
 							},
 						}
 					}
@@ -66,6 +70,7 @@ func (h *Hub) Run() {
 		case message := <-h.Broadcast:
 			if _, ok := h.Sessions[message.SessionID]; ok {
 				for _, player := range h.Sessions[message.SessionID].Players {
+					message.Data["game"] = h.Sessions[message.SessionID].Game
 					player.Message <- message
 				}
 			}

@@ -5,11 +5,15 @@ import { useParams } from "react-router";
 import { useWebSocket } from "../api/websocket";
 import { useAuth } from "../context/AuthContext";
 
+type Session = {
+  session_id: string;
+  game_id: string;
+};
+
 function GamePage() {
   const { sessionID } = useParams<{ sessionID: string }>();
   const [gameID, setGameID] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
-  const { token } = useAuth();
   const { user } = useAuth();
 
   const { sendMessage } = useWebSocket(
@@ -19,52 +23,56 @@ function GamePage() {
         console.error("No message");
       }
       console.log(msg);
-      setGameID(msg.data.game_id);
-      console.log(msg.data.game_id);
+      setGame(msg.data.game);
     }
   );
 
-  const sendHello = () => {
-    console.log("Sending hello");
-
-    if (sessionID) {
-      sendMessage(JSON.stringify({
-        action: "hello",
-        session_id: sessionID,
-        data: { msg: "Hello, World!" },
-      }));
-    } else {
-      console.error("No session ID");
-    }
-  };
-
   useEffect(() => {
-    const fetchGame = async () => {
+    const getSessionInfo = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/games", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ game_id: gameID }),
-        });
-        const game = await response.json();
-        setGame(game);
+        const response = await fetch("http://localhost:8080/ws/sessions");
+        if (response.status !== 200) {
+          console.error("Error getting session info");
+          return;
+        }
+        const sessions: Session[] = await response.json();
+        const session = sessions.find((s) => s.session_id === sessionID);
+        if (session) {
+          setGameID(session.game_id);
+          console.log(gameID);
+        } else {
+          console.error("Session not found");
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchGame();
-  }, []);
+    getSessionInfo();
+  }, [sessionID]);
+
+  const sendHello = () => {
+    console.log("Sending hello");
+
+    if (sessionID) {
+      sendMessage(
+        JSON.stringify({
+          action: "hello",
+          session_id: sessionID,
+          data: { msg: "Hello, World!" },
+        })
+      );
+    } else {
+      console.error("No session ID");
+    }
+  };
 
   if (!game) return <div>WTF...</div>;
 
   return (
-    <div>
+    <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
       <ChessBoard game={game} />
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center mt-4">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
           onClick={sendHello}
