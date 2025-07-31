@@ -7,7 +7,7 @@ import type { Session } from "./types";
 import { authFetch } from "../api/authFetch";
 
 function Home() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
 
   const navigate = useNavigate();
@@ -19,7 +19,6 @@ function Home() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -51,7 +50,6 @@ function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ id: uuidv4() }),
       });

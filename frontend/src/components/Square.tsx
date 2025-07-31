@@ -7,13 +7,13 @@ interface SquareProps {
   isLight: boolean;
 }
 
-function getSquareColor(isLight: boolean) {
-  return isLight ? "bg-amber-100" : "bg-amber-800";
-}
-
 function Square({ piece, position, isLight }: SquareProps) {
   const getFile = (x: number) => String.fromCharCode(97 + x);
   const getRank = (y: number) => 8 - y;
+
+  const getSquareColor = (isLight: boolean) => {
+    return isLight ? "bg-amber-100" : "bg-amber-800";
+  };
 
   return (
     <div

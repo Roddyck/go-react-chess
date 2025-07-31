@@ -8,34 +8,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("accessToken")
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadUser = async () => {
       if (token) {
         try {
-          const response = await fetch(`${API_URL}/api/users`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await authFetch(`${API_URL}/api/users`);
 
           const data = await response.json();
           if (response.status !== 200) {
-            localStorage.removeItem("token");
-            setToken(null);
+            clearAuthTokens();
             setUser(null);
             navigate("/login");
           }
 
           setUser(data);
         } catch (error) {
-          localStorage.removeItem("token");
-          setToken(null);
+          clearAuthTokens();
           setUser(null);
           navigate("/login");
         }
@@ -47,7 +41,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    const response = await authFetch("http://localhost:8080/api/login", {
+    const response = await fetch("http://localhost:8080/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +59,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data);
     setAuthTokens(data.access_token, data.refresh_token);
     setToken(data.access_token);
-    localStorage.setItem("token", data.access_token);
     navigate("/");
   };
 
@@ -86,16 +79,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setUser(data);
     setToken(data.access_token);
-    localStorage.setItem("token", data.access_token);
+    localStorage.setItem("accessToken", data.access_token);
 
     navigate("/");
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    clearAuthTokens();
     setToken(null);
     setUser(null);
-    clearAuthTokens();
     navigate("/login");
   };
 
@@ -103,7 +95,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
         login,
         register,
         logout,

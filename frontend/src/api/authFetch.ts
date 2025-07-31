@@ -1,17 +1,17 @@
 import { API_URL } from "./chessApi";
 
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
+let accessToken = localStorage.getItem("accessToken");
+let refreshToken = localStorage.getItem("refreshToken");
 let refreshPromise: Promise<void> | null = null;
 
 export const setAuthTokens = (access: string, refresh: string) => {
-  accessToken = access;
-  refreshToken = refresh;
+  localStorage.setItem("accessToken", access);
+  localStorage.setItem("refreshToken", refresh);
 };
 
 export const clearAuthTokens = () => {
-  accessToken = null;
-  refreshToken = null;
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 };
 
 async function refreshAuthToken(): Promise<void> {
@@ -33,6 +33,7 @@ async function refreshAuthToken(): Promise<void> {
     }
 
     const { access_token } = await response.json();
+    setAuthTokens(access_token, refreshToken);
     accessToken = access_token;
   } catch (error) {
     clearAuthTokens();
@@ -44,6 +45,7 @@ export async function authFetch(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<Response> {
+  accessToken = localStorage.getItem("accessToken");
   const headers = new Headers(init?.headers);
 
   if (accessToken) {
