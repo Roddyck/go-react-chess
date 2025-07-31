@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -17,6 +18,15 @@ type Game struct {
 	Turn    string
 	History json.RawMessage
 	Players json.RawMessage
+}
+
+type RefreshToken struct {
+	Token     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+	ExpiresAt time.Time
+	RevokedAt sql.NullTime
 }
 
 type User struct {

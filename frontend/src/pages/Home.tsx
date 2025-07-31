@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { API_URL } from "../api/chessApi";
 import { useNavigate } from "react-router";
 import type { Session } from "./types";
+import { authFetch } from "../api/authFetch";
 
 function Home() {
   const { user, token } = useAuth();
@@ -14,7 +15,7 @@ function Home() {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await fetch(`${API_URL}/ws/sessions`, {
+        const response = await authFetch(`${API_URL}/ws/sessions`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -46,7 +47,7 @@ function Home() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${API_URL}/ws/sessions`, {
+      const response = await authFetch(`${API_URL}/ws/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

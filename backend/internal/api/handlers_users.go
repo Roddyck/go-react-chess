@@ -84,7 +84,8 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 
 	type loginResponse struct {
 		User
-		AccessToken string `json:"access_token"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	creds := credentials{}
@@ -112,6 +113,24 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	refreshToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, "Error creating refresh token", err)
+		return
+	}
+
+	_, err = cfg.db.CreateRefreshToken(r.Context(), database.CreateRefreshTokenParams{
+		Token:     refreshToken,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 60).UTC(),
+	})
+	if err != nil {
+		util.RespondWithError(w, http.StatusInternalServerError, "Error creating refresh token", err)
+		return
+	}
+
 	util.RespondWithJSON(w, http.StatusOK, loginResponse{
 		User: User{
 			ID:        user.ID,
@@ -120,6 +139,7 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 			Name:      user.Name,
 			Email:     user.Email,
 		},
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 }

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -20,20 +21,73 @@ func TestHashPassword(t *testing.T) {
 	}
 }
 
-func TestMakeJWT(t *testing.T) {
-	userID := uuid.New()
+func TestMakeAndValidateJWTValid(t *testing.T) {
 	tokenSecret := "secret"
-	token, err := MakeJWT(userID, tokenSecret, time.Hour)
+	userID := uuid.New()
+	tokenString, err := MakeJWT(userID, tokenSecret, time.Hour)
 	if err != nil {
-		t.Errorf("error making JWT: %v", err)
+		t.Fatal(err)
 	}
 
-	id, err := ValidateJWT(token, tokenSecret)
+	id, err := ValidateJWT(tokenString, tokenSecret)
 	if err != nil {
-		t.Errorf("error validating JWT: %v", err)
+		t.Fatal(err)
 	}
-
 	if id != userID {
-		t.Errorf("expected user id %s, got %s", userID, id)
+		t.Fatal("user id mismatch")
+	}
+}
+
+func TestMakeAndValidateJWTInvalid(t *testing.T) {
+	tokenSecret := "secret"
+	userID := uuid.New()
+	tokenString, err := MakeJWT(userID, tokenSecret, time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = ValidateJWT(tokenString, "wrong secret")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestMakeAndValidateJWTExpired(t *testing.T) {
+	tokenSecret := "secret"
+	userID := uuid.New()
+	tokenString, err := MakeJWT(userID, tokenSecret, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(time.Second)
+
+	_, err = ValidateJWT(tokenString, tokenSecret)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetBearerToken(t *testing.T) {
+	headers := http.Header{
+		"Authorization": {"Bearer tokenTest"},
+	}
+
+	token, err := GetBearerToken(headers)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if token != "tokenTest" {
+		t.Fatalf("wrong token, expected: tokenTest, got: %s", token)
+	}
+}
+
+func TestGetBearerTokenEmpty(t *testing.T) {
+	headers := http.Header{}
+
+	_, err := GetBearerToken(headers)
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }

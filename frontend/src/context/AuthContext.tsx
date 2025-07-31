@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import type { User, AuthContextType } from "./types";
 import { useNavigate } from "react-router";
 import { API_URL } from "../api/chessApi";
+import { authFetch, clearAuthTokens, setAuthTokens } from "../api/authFetch";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -46,7 +47,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch("http://localhost:8080/api/login", {
+    const response = await authFetch("http://localhost:8080/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,6 +63,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data);
+    setAuthTokens(data.access_token, data.refresh_token);
     setToken(data.access_token);
     localStorage.setItem("token", data.access_token);
     navigate("/");
@@ -93,6 +95,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
+    clearAuthTokens();
     navigate("/login");
   };
 

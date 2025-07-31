@@ -54,6 +54,8 @@ func main() {
 	mux.HandleFunc("GET /api/users", cfg.AuthMiddleware(cfg.GetUser))
 	mux.HandleFunc("POST /api/games", cfg.AuthMiddleware(cfg.HandlerGetGame))
 	mux.HandleFunc("POST /api/login", cfg.HandlerLogin)
+	mux.HandleFunc("POST /api/refresh", cfg.HandlerRefresh)
+	mux.HandleFunc("POST /api/revoke", cfg.HandlerRevoke)
 
 	mux.HandleFunc("POST /ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
 	mux.HandleFunc("GET /ws/sessions", wsHandler.GetSessions)
