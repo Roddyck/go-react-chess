@@ -22,4 +22,7 @@ export type Game = {
   ID: string;
   board: (Piece | null)[][];
   turn: Color;
+  players: {
+    [key in Color]: string;
+  };
 }

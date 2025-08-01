@@ -107,7 +107,7 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := auth.MakeJWT(user.ID, cfg.TokenSecret, time.Second*2)
+	accessToken, err := auth.MakeJWT(user.ID, cfg.TokenSecret, time.Minute*15)
 	if err != nil {
 		util.RespondWithError(w, http.StatusInternalServerError, "Error creating access token", err)
 		return

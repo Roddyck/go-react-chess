@@ -109,11 +109,6 @@ func (h *Handler) JoinSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(h.hub.Sessions[sessionID].Players) == 2 {
-		util.RespondWithError(w, http.StatusBadRequest, "session is full", nil)
-		return
-	}
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("error upgrading connection", err)

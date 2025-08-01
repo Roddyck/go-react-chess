@@ -51,6 +51,10 @@ function GamePage() {
     getSessionInfo();
   }, [sessionID]);
 
+  const getPlayerColor = () => {
+    return user?.id === game?.players.black ? "black" : "white";
+  }
+
   const sendHello = () => {
     console.log("Sending hello");
 
@@ -71,7 +75,7 @@ function GamePage() {
 
   return (
     <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
-      <ChessBoard game={game} />
+      <ChessBoard game={game} playerColor={getPlayerColor()} />
       <div className="flex justify-center items-center mt-4">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"

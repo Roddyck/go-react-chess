@@ -47,6 +47,9 @@ func (h *Hub) Run() {
 
 				if _, ok := s.Players[player.ID]; !ok {
 					s.Players[player.ID] = player
+					if player.ID != s.Game.Players[game.White] {
+						s.Game.Players[game.Black] = player.ID
+					}
 				}
 			}
 		case player := <-h.Unregister:
