@@ -1,6 +1,10 @@
 package game
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type Game struct {
 	ID      uuid.UUID           `json:"id"`
@@ -36,4 +40,23 @@ func (g *Game) initBoard() {
 		g.Board[0][x] = NewPiece(piece, Black)
 		g.Board[7][x] = NewPiece(piece, White)
 	}
+}
+
+func (g *Game) HandleMove(move Move) error {
+	piece := g.Board[move.From.Y][move.From.X]
+	if piece.GetColor() != g.Turn {
+		return fmt.Errorf("invalid move: trying to move a %s piece on %s turn", piece.GetType(), g.Turn)
+	}
+
+	g.Board[move.To.Y][move.To.X] = piece
+	g.Board[move.From.Y][move.From.X] = nil
+	g.History = append(g.History, move)
+
+	if g.Turn == White {
+		g.Turn = Black
+	} else {
+		g.Turn = White
+	}
+
+	return nil
 }

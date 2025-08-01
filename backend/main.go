@@ -32,7 +32,6 @@ func main() {
 
 	hub := ws.NewHub(dbQueries)
 	wsHandler := ws.NewHandler(hub)
-	go hub.Run()
 
 	mux := http.NewServeMux()
 
@@ -60,6 +59,8 @@ func main() {
 	mux.HandleFunc("POST /ws/sessions", cfg.AuthMiddleware(wsHandler.CreateSession))
 	mux.HandleFunc("GET /ws/sessions", wsHandler.GetSessions)
 	mux.HandleFunc("/ws/sessions/{roomID}", wsHandler.JoinSession)
+
+	go hub.Run()
 
 	log.Println("Listening on port", port)
 	log.Fatal(httpServer.ListenAndServe())

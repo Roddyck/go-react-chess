@@ -5,15 +5,22 @@ interface SquareProps {
   piece: Piece | null;
   position: Position;
   isLight: boolean;
+  isSelected: boolean;
+  onClick: (pos: Position) => void;
 }
 
-function Square({ piece, position, isLight }: SquareProps) {
+function Square({ piece, position, isLight, isSelected, onClick }: SquareProps) {
   const getFile = (x: number) => String.fromCharCode(97 + x);
   const getRank = (y: number) => 8 - y;
 
   const getSquareColor = (isLight: boolean) => {
+    if (isSelected) return "bg-green-200";
     return isLight ? "bg-amber-100" : "bg-amber-800";
   };
+
+  const handleClick = () => {
+    onClick(position);
+  }
 
   return (
     <div
@@ -25,6 +32,7 @@ function Square({ piece, position, isLight }: SquareProps) {
         hover:opacity-80
         select-none
     `}
+      onClick={handleClick}
     >
       {(position.y === 7 || position.x === 0) && (
         <div

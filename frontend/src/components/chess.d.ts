@@ -18,6 +18,11 @@ export type Position = {
   y: number;
 }
 
+export type Move = {
+  from: Position;
+  to: Position;
+}
+
 export type Game = {
   ID: string;
   board: (Piece | null)[][];
