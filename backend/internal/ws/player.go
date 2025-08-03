@@ -74,8 +74,11 @@ func handleMessage(msg Message, hub *Hub) {
 
 	case "move":
 		session := hub.Sessions[msg.SessionID]
-		move := game.Move{}
-		parseMove(msg, &move)
+		move := &game.Move{
+			From: &game.Position{},
+			To:   &game.Position{},
+		}
+		parseMove(msg, move)
 		err := session.Game.HandleMove(move)
 		if err != nil {
 			message := &Message{
@@ -105,8 +108,15 @@ func handleMessage(msg Message, hub *Hub) {
 func parseMove(msg Message, move *game.Move) {
 	from := msg.Data["move"].(map[string]any)["from"].(map[string]any)
 	to := msg.Data["move"].(map[string]any)["to"].(map[string]any)
-	move.From.X = int(from["x"].(float64))
-	move.From.Y = int(from["y"].(float64))
-	move.To.X = int(to["x"].(float64))
-	move.To.Y = int(to["y"].(float64))
+
+	posFrom := &game.Position{
+		X: int(from["x"].(float64)),
+		Y: int(from["y"].(float64)),
+	}
+	posTo := &game.Position{
+		X: int(to["x"].(float64)),
+		Y: int(to["y"].(float64)),
+	}
+	move.From = posFrom
+	move.To = posTo
 }

@@ -6,6 +6,6 @@ type Position struct {
 }
 
 type Move struct {
-	From Position `json:"from"`
-	To   Position `json:"to"`
+	From *Position `json:"from"`
+	To   *Position `json:"to"`
 }

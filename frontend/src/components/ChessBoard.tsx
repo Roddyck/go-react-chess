@@ -45,12 +45,13 @@ function ChessBoard({ game, playerColor, onMove }: ChessBoardProps) {
           {revesedBoard.map((row, y) => (
             <div key={y} style={{ display: "flex" }}>
               {row.map((piece, x) => {
-                const isSelected = selectedPos?.x === 7 - x && selectedPos?.y === 7 - y;
+                const isSelected =
+                  selectedPos?.x === x && selectedPos?.y === 7 - y;
                 const isLight = (7 - x + (7 - y)) % 2 === 0;
                 return (
                   <Square
                     key={`${7 - x}-${7 - y}`}
-                    position={{ x: 7 - x, y: 7 - y }}
+                    position={{ x: x, y: 7 - y }}
                     piece={piece}
                     isLight={isLight}
                     isSelected={isSelected}
@@ -66,10 +67,8 @@ function ChessBoard({ game, playerColor, onMove }: ChessBoardProps) {
   };
 
   const handleSquareClick = (pos: Position) => {
-    if (playerColor === "black") {
-      pos = { x: 7 - pos.x, y: 7 - pos.y };
-    }
     if (selectedPos) {
+      console.log(selectedPos, pos);
       const move = { from: selectedPos, to: pos };
       onMove(move);
       setSelectedPos(null);

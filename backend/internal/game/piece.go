@@ -21,6 +21,7 @@ const (
 type Piece interface {
 	GetType() PieceType
 	GetColor() Color
+	CheckLegalMove(g *Game, move *Move) error
 }
 
 func NewPiece(pieceType PieceType, color Color) Piece {
@@ -40,4 +41,12 @@ func NewPiece(pieceType PieceType, color Color) Piece {
 	default:
 		return nil
 	}
+}
+
+// ok golang, you actually don't have it in the standard library
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

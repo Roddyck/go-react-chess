@@ -60,7 +60,7 @@ func (h *Hub) Run() {
 							Action:    "player_left",
 							SessionID: player.SessionID,
 							Data: map[string]any{
-								"msg": "Player left the game",
+								"msg":  "Player left the game",
 								"game": h.Sessions[player.SessionID].Game,
 							},
 						}
