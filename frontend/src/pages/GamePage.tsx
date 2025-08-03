@@ -63,7 +63,7 @@ function GamePage() {
         JSON.stringify({
           action: "hello",
           session_id: sessionID,
-          data: {msg : "Hello, World!"},
+          data: { msg: "Hello, World!" },
         })
       );
     } else {
@@ -85,7 +85,11 @@ function GamePage() {
 
   return (
     <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
-      <ChessBoard game={game} playerColor={getPlayerColor()} onMove={handleMove} />
+      <ChessBoard
+        game={game}
+        playerColor={getPlayerColor()}
+        onMove={handleMove}
+      />
       <div className="flex justify-center items-center mt-4">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"

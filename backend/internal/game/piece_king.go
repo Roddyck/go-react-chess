@@ -47,24 +47,25 @@ func (k *KingPiece) CheckLegalMove(g *Game, move *Move) error {
 		for i := range 8 {
 			for j := range 8 {
 				piece := board[i][j]
-
+ 
 				if piece == nil {
 					continue
 				}
 
-				if piece.GetColor() == fromPiece.GetColor() {
+				if piece.GetColor() == toPiece.GetColor() {
 					continue
 				}
 
 				if err := piece.CheckLegalMove(g, &Move{
-					From: &Position{j, i},
-					To:   move.To,
-				}); err != nil {
-					return fmt.Errorf("invalid move: invalid capture")
+					From: &Position{X: j, Y: i},
+					To:   to,
+				}); err == nil {
+					return fmt.Errorf("invalid move: king will be under attack after move by %s %s at x:%d y:%d, to x:%d y:%d",
+						piece.GetColor(), piece.GetType(), j, i, to.X, to.Y)
 				}
 			}
-			return nil
 		}
+		return nil
 	}
 
 	return k.canCastle(g, move)

@@ -1,6 +1,10 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+
+)
 
 type RookPiece struct {
 	Type     PieceType `json:"type"`
@@ -22,6 +26,12 @@ func (r *RookPiece) CheckLegalMove(g *Game, move *Move) error {
 	board := g.Board
 	fromPiece := board[from.Y][from.X]
 	toPiece := board[to.Y][to.X]
+
+	log.Printf("checking rook move from %v to %v", from, to)
+	log.Printf("%d", absInt(to.X-from.X)*absInt(to.Y-from.Y))
+	if from == to {
+		return fmt.Errorf("invalid move: can't move to the same square")
+	}
 
 	if toPiece != nil && toPiece.GetColor() == fromPiece.GetColor() {
 		return fmt.Errorf("invalid move: trying to capture own piece")
