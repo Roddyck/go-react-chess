@@ -1,8 +1,8 @@
 # TODO
 
 ## Game Rules
-- [ ] make custling work
-- [ ] enpassant
+- [x] make custling work
+- [x] enpassant
 - [ ] enforce legal moves when king is in check
 
 ## Game Logic
@@ -19,9 +19,13 @@
 ## UI ?
 - [ ] piece animations
 - [ ] show move on the frontend before it is made on the server and rollback if it is invalid
+- [ ] show game history
 
 ## Containerization
 - [ ] Add db migrations
 
 ## Auth
 - [ ] Maybe should set cookies for auth tokens so auth is actually more or less secure
+
+## General
+- [ ] add ability to watch your past games
