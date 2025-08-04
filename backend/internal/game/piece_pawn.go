@@ -65,8 +65,15 @@ func (p *PawnPiece) CheckLegalMove(g *Game, move *Move) error {
 		if dir := to.Y - from.Y; dir == 2 || dir == -2 {
 			return fmt.Errorf("invalid move: diagonal move by two ranks")
 		}
-		if toPiece != nil {
-			return fmt.Errorf("invalid move: invalid enpassant")
+
+		if len(g.History) > 0 {
+			if err := p.canEnpassant(g, move, g.History[len(g.History)-1]); err == nil {
+				return nil
+			}
+		}
+
+		if toPiece == nil {
+			return fmt.Errorf("invalid move: invalid capture")
 		}
 		return nil
 	}

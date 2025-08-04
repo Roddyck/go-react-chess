@@ -85,3 +85,24 @@ func TestPawnEnpassant(t *testing.T) {
 		t.Error("pawn not placed at the right position")
 	}
 }
+
+func TestPawnCapture(t *testing.T) {
+	moves := []*Move{
+		{From: &Position{X: 4, Y: 6}, To: &Position{X: 4, Y: 4}},
+		{From: &Position{X: 3, Y: 1}, To: &Position{X: 3, Y: 3}},
+		{From: &Position{X: 4, Y: 4}, To: &Position{X: 3, Y: 3}},
+	}
+
+	game, err := setupGame(moves, t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if game.Board[3][3] == nil {
+		t.Fatal("pawn position not set")
+	}
+
+	if game.Board[3][3].GetType() != Pawn && game.Board[3][3].GetColor() != White {
+		t.Error("pawn not placed at the right position")
+	}
+}
