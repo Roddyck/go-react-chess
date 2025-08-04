@@ -75,7 +75,7 @@ func isCastlingMove(move *Move) bool {
 	from := move.From
 	to := move.To
 
-	return from.X == 4 && to.Y == from.Y && (from.X == 0 || from.X == 7) && (from.Y == 0 || from.Y == 7)
+	return from.X == 4 && to.Y == from.Y && (to.X == 0 || to.X == 7) && (from.Y == 0 || from.Y == 7)
 }
 
 func (k *KingPiece) canCastle(g *Game, move *Move) error {
@@ -150,9 +150,9 @@ func (k *KingPiece) canCastle(g *Game, move *Move) error {
 				}
 
 				if err := board[square.Y][square.X].CheckLegalMove(g, &Move{
-					From: pos,
-					To:   square,
-				}); err != nil {
+					From: square,
+					To:   pos,
+				}); err == nil {
 					return fmt.Errorf("invalid move: can't castle through check")
 				}
 			}
