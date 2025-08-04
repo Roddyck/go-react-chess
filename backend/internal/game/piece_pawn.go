@@ -65,9 +65,26 @@ func (p *PawnPiece) CheckLegalMove(g *Game, move *Move) error {
 		if dir := to.Y - from.Y; dir == 2 || dir == -2 {
 			return fmt.Errorf("invalid move: diagonal move by two ranks")
 		}
-		if toPiece == nil {
-			return fmt.Errorf("invalid move: no piece to capture")
+		if toPiece != nil {
+			return fmt.Errorf("invalid move: invalid enpassant")
 		}
 		return nil
 	}
+}
+
+func (p *PawnPiece) canEnpassant(g *Game, move *Move, lastMove *Move) error {
+	from := move.From
+	to := move.To
+
+	if lastMove == nil {
+		return fmt.Errorf("invalid move: can't enpassant without a previous move")
+	}
+
+	_, ok := g.Board[lastMove.To.Y][lastMove.To.X].(*PawnPiece)
+	lastMoveDist := absInt(lastMove.To.Y - lastMove.From.Y)
+	if ok && lastMoveDist == 2 && lastMove.To.Y == from.Y && lastMove.To.X == to.X {
+		return nil
+	}
+
+	return fmt.Errorf("invalid move: can't enpassant")
 }

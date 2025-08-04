@@ -52,6 +52,11 @@ func (g *Game) updateBoard(move *Move) {
 		if !p.HasMoved {
 			p.HasMoved = true
 		}
+		if len(g.History) > 0 {
+			if err := p.canEnpassant(g, move, g.History[len(g.History)-1]); err == nil {
+				g.Board[move.From.Y][move.To.X] = nil
+			}
+		}
 	case *KingPiece:
 		if p.GetColor() == White {
 			if err := p.canCastle(g, move); err == nil {

@@ -26,7 +26,7 @@ func (k *KnightPiece) CheckLegalMove(g *Game, move *Move) error {
 		return fmt.Errorf("invalid move: trying to capture own piece")
 	}
 
-	if absInt(to.X-from.X) * absInt(to.Y-from.Y) != 2 {
+	if absInt(to.X-from.X)*absInt(to.Y-from.Y) != 2 {
 		return fmt.Errorf("invalid move: invalid knight move")
 	}
 

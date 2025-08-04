@@ -47,7 +47,7 @@ func (k *KingPiece) CheckLegalMove(g *Game, move *Move) error {
 		for i := range 8 {
 			for j := range 8 {
 				piece := board[i][j]
- 
+
 				if piece == nil {
 					continue
 				}
