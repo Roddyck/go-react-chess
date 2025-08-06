@@ -106,3 +106,24 @@ func TestPawnCapture(t *testing.T) {
 		t.Error("pawn not placed at the right position")
 	}
 }
+
+func TestCheckmate(t *testing.T) {
+	moves := []*Move{
+		{From: &Position{X: 4, Y: 6}, To: &Position{X: 4, Y: 4}},
+		{From: &Position{X: 4, Y: 1}, To: &Position{X: 4, Y: 3}},
+		{From: &Position{X: 5, Y: 7}, To: &Position{X: 2, Y: 4}},
+		{From: &Position{X: 1, Y: 0}, To: &Position{X: 2, Y: 2}},
+		{From: &Position{X: 3, Y: 7}, To: &Position{X: 7, Y: 3}},
+		{From: &Position{X: 6, Y: 0}, To: &Position{X: 5, Y: 2}},
+		{From: &Position{X: 7, Y: 3}, To: &Position{X: 5, Y: 1}},
+	}
+
+	game, err := setupGame(moves, t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if game.Status != whiteCheckmate {
+		t.Fatalf("game status is not checkmate, Status: %s", game.Status)
+	}
+}
