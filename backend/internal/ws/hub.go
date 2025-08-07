@@ -6,10 +6,19 @@ import (
 	"github.com/google/uuid"
 )
 
+type SessionStatus string
+
+const (
+	active = "active"
+	full   = "full"
+	ended  = "ended"
+)
+
 type Session struct {
 	ID      uuid.UUID
 	Players map[uuid.UUID]*Player
 	Game    *game.Game
+	Status  SessionStatus
 }
 
 type Hub struct {
@@ -25,12 +34,13 @@ func InitSession(sessionID uuid.UUID) *Session {
 		ID:      sessionID,
 		Players: make(map[uuid.UUID]*Player),
 		Game:    game.NewGame(),
+		Status:  active,
 	}
 }
 
 func NewHub(dbQueries *database.Queries) *Hub {
 	return &Hub{
-		Sessions:   make(map[uuid.UUID]*Session),
+		Sessions:   make(map[uuid.UUID]*Session, 0),
 		Register:   make(chan *Player),
 		Unregister: make(chan *Player),
 		Broadcast:  make(chan *Message),
@@ -50,6 +60,10 @@ func (h *Hub) Run() {
 					if player.ID != s.Game.Players[game.White] {
 						s.Game.Players[game.Black] = player.ID
 					}
+				}
+
+				if len(s.Players) == 2 {
+					s.Status = full
 				}
 			}
 		case player := <-h.Unregister:

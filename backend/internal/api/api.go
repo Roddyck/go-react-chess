@@ -33,6 +33,7 @@ func (cfg *apiConfig) AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc 
 		userID, err := auth.ValidateJWT(token, cfg.TokenSecret)
 		if err != nil {
 			util.RespondWithError(w, http.StatusUnauthorized, "Invalid access token", err)
+			return
 		}
 
 		ctx := context.WithValue(r.Context(), "userID", userID)

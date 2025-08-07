@@ -124,6 +124,6 @@ func TestCheckmate(t *testing.T) {
 	}
 
 	if game.Status != whiteCheckmate {
-		t.Fatalf("game status is not checkmate, Status: %s", game.Status)
+		t.Fatalf("game status is not white checkmate, Status: %s", game.Status)
 	}
 }

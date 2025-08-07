@@ -10,9 +10,9 @@ import (
 type GameStatus string
 
 const (
-	active         GameStatus = "ACTIVE"
-	blackCheckmate GameStatus = "BLACK_CHECKMATE"
-	whiteCheckmate GameStatus = "WHITE_CHECKMATE"
+	active         GameStatus = "active"
+	blackCheckmate GameStatus = "black_checkmate"
+	whiteCheckmate GameStatus = "white_checkmate"
 )
 
 type Game struct {
@@ -21,8 +21,8 @@ type Game struct {
 	Turn           Color               `json:"turn"`
 	History        []*Move             `json:"history"`
 	Players        map[Color]uuid.UUID `json:"players"`
-	KingsPositions [2]*Position
-	Status         GameStatus
+	KingsPositions [2]*Position        `json:"king_positions"`
+	Status         GameStatus          `json:"status"`
 }
 
 func NewGame() *Game {
@@ -32,6 +32,7 @@ func NewGame() *Game {
 		History:        []*Move{},
 		Players:        make(map[Color]uuid.UUID),
 		KingsPositions: [2]*Position{},
+		Status:         active,
 	}
 
 	game.initBoard()

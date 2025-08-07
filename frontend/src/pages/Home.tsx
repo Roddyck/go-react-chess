@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 import { API_URL } from "../api/chessApi";
@@ -9,6 +9,9 @@ import { authFetch } from "../api/authFetch";
 function Home() {
   const { user } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
+  const visibleSessions = useMemo(() => {
+    return sessions?.filter((session) => session.status !== "full");
+  }, [sessions]);
 
   const navigate = useNavigate();
 
@@ -38,7 +41,6 @@ function Home() {
       console.error("User not logged in");
       return;
     }
-    console.log("UserID", user.id);
     navigate(`/session/${sessionID}?userID=${user.id}&username=${user.name}`);
   };
 
@@ -75,10 +77,10 @@ function Home() {
         Create Game
       </button>
       <div className="mt-4">
-        {sessions && (
+        {visibleSessions && (
           <div className="items-center justify-center flex flex-col">
             <h2 className="text-2xl font-bold">Active Sessions</h2>
-            {sessions.map((session) => (
+            {visibleSessions.map((session) => (
               <div key={session.session_id} className="flex flex-col">
                 <li
                   key={session.session_id}

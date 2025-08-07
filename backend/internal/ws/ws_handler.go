@@ -76,8 +76,9 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 	type responseParams struct {
-		SessionID string `json:"session_id"`
-		GameID    string `json:"game_id"`
+		SessionID string        `json:"session_id"`
+		GameID    string        `json:"game_id"`
+		Status    SessionStatus `json:"status"`
 	}
 	sessions := h.hub.Sessions
 
@@ -86,6 +87,7 @@ func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 		response = append(response, responseParams{
 			SessionID: sessionID.String(),
 			GameID:    session.Game.ID.String(),
+			Status:    session.Status,
 		})
 	}
 
