@@ -137,19 +137,19 @@ func (k *KingPiece) canCastle(g *Game, move *Move) error {
 	}
 
 	for _, pos := range inBetweens {
-		for x := range 8 {
-			for y := range 8 {
-				square := &Position{x, y}
+		for y := range 8 {
+			for x := range 8 {
+				square := &Position{X: x, Y: y}
 
-				if board[square.Y][square.X] == nil {
+				if board[y][x] == nil {
 					continue
 				}
 
-				if board[square.Y][square.X].GetColor() == fromPiece.GetColor() {
+				if board[y][x].GetColor() == fromPiece.GetColor() {
 					continue
 				}
 
-				if err := board[square.Y][square.X].CheckLegalMove(g, &Move{
+				if err := board[y][x].CheckLegalMove(g, &Move{
 					From: square,
 					To:   pos,
 				}); err == nil {

@@ -47,7 +47,7 @@ function ChessBoard({ game, playerColor, onMove }: ChessBoardProps) {
               {row.map((piece, x) => {
                 const isSelected =
                   selectedPos?.x === x && selectedPos?.y === 7 - y;
-                const isLight = (7 - x + (7 - y)) % 2 === 0;
+                const isLight = (x + (7 - y)) % 2 === 0;
                 return (
                   <Square
                     key={`${7 - x}-${7 - y}`}

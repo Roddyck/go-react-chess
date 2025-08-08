@@ -95,7 +95,7 @@ func (g *Game) kingInCheck() bool {
 		for x := range 8 {
 			square := &Position{X: x, Y: y}
 
-			piece := g.Board[square.Y][square.X]
+			piece := g.Board[y][x]
 
 			if piece == nil {
 				continue

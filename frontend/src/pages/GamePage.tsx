@@ -4,6 +4,7 @@ import type { Game, Move } from "../components/chess";
 import { useParams } from "react-router";
 import { useWebSocket } from "../api/websocket";
 import { useAuth } from "../context/AuthContext";
+import { GameEndModal } from "../components/GameEndModal";
 
 type Session = {
   session_id: string;
@@ -15,6 +16,7 @@ function GamePage() {
   const [gameID, setGameID] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const { user } = useAuth();
+  const [showModal, setShowModal] = useState(false);
 
   const { sendMessage } = useWebSocket(
     `ws://localhost:8080/ws/sessions/${sessionID}?userID=${user?.id}&username=${user?.name}`,
@@ -24,6 +26,13 @@ function GamePage() {
       }
       console.log(msg);
       setGame(msg.data.game);
+
+      if (
+        msg.data.game.status === "white_checkmate" ||
+        msg.data.game.status === "black_checkmate"
+      ) {
+        setShowModal(true);
+      }
     }
   );
 
@@ -55,22 +64,6 @@ function GamePage() {
     return user?.id === game?.players.black ? "black" : "white";
   };
 
-  const sendHello = () => {
-    console.log("Sending hello");
-
-    if (sessionID) {
-      sendMessage(
-        JSON.stringify({
-          action: "hello",
-          session_id: sessionID,
-          data: { msg: "Hello, World!" },
-        })
-      );
-    } else {
-      console.error("No session ID");
-    }
-  };
-
   const handleMove = (move: Move) => {
     sendMessage(
       JSON.stringify({
@@ -84,20 +77,21 @@ function GamePage() {
   if (!game) return <div>WTF...</div>;
 
   return (
-    <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
-      <ChessBoard
-        game={game}
-        playerColor={getPlayerColor()}
-        onMove={handleMove}
-      />
-      <div className="flex justify-center items-center mt-4">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
-          onClick={sendHello}
-        >
-          Send Hello
-        </button>
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
+      <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
+        <ChessBoard
+          game={game}
+          playerColor={getPlayerColor()}
+          onMove={handleMove}
+        />
       </div>
+      { showModal && game.status && (
+        <GameEndModal
+          result={{type: "checkmate", winner: game.status === "white_checkmate" ? "white" : "black" }}
+          playerColor={getPlayerColor()}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

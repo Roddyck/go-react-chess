@@ -89,6 +89,7 @@ func handleMessage(msg Message, hub *Hub) {
 				},
 			}
 			hub.Broadcast <- message
+			return
 		}
 
 		message := &Message{

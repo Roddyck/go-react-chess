@@ -30,4 +30,5 @@ export type Game = {
   players: {
     [key in Color]: string;
   };
+  status: string;
 }
