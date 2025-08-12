@@ -10,6 +10,7 @@ import (
 	"github.com/Roddyck/go-react-chess/internal/database"
 	"github.com/Roddyck/go-react-chess/internal/ws"
 	"github.com/Roddyck/go-react-chess/middleware"
+	"github.com/Roddyck/go-react-chess/sql/schema"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -20,7 +21,12 @@ func main() {
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Printf("error opening database: %v", err)
+		log.Fatalf("error opening database: %v", err)
+	}
+
+	err = schema.RunMigrations(db)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
 	port := os.Getenv("PORT")
