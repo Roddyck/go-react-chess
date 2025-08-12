@@ -13,7 +13,7 @@ function Register() {
     e.preventDefault();
     try {
       await register(name, email, password);
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       alert("Registration failed");
     }

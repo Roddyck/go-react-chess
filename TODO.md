@@ -3,7 +3,7 @@
 ## Game Rules
 - [x] make custling work
 - [x] enpassant
-- [ ] enforce legal moves when king is in check
+- [x] enforce legal moves when king is in check
 
 ## Game Logic
 - [ ] game status (checkmate, stalemate, draw, etc)
@@ -17,12 +17,10 @@
 - [ ] set names for sessions
 
 ## UI ?
-- [ ] piece animations
-- [ ] show move on the frontend before it is made on the server and rollback if it is invalid
 - [ ] show game history
 
 ## Containerization
-- [ ] Add db migrations
+- [x] Add db migrations
 
 ## Auth
 - [ ] Maybe should set cookies for auth tokens so auth is actually more or less secure

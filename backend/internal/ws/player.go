@@ -69,9 +69,6 @@ func (p *Player) readMessage(hub *Hub) {
 
 func handleMessage(msg Message, hub *Hub) {
 	switch msg.Action {
-	case "hello":
-		hub.Broadcast <- &msg
-
 	case "move":
 		session := hub.Sessions[msg.SessionID]
 		move := &game.Move{

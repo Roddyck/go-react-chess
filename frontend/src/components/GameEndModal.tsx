@@ -1,19 +1,24 @@
 import type { Color } from "./chess";
 
 type GameEndModalProps = {
-  result: {
-    type: string;
-    winner?: "white" | "black";
-  };
+  status: string;
+  turn: Color;
   playerColor: Color;
   onClose: () => void;
 };
 
-function GameEndModal({ result, playerColor, onClose }: GameEndModalProps) {
+function GameEndModal({
+  status,
+  turn,
+  playerColor,
+  onClose,
+}: GameEndModalProps) {
   const getModalContent = () => {
-    switch (result.type) {
-      case "checkmate":
-        const isWinner = result.winner === playerColor;
+    switch (status) {
+      case "white_checkmate":
+      case "black_checkmate":
+        // turn change on the server happens before checking for checkmate
+        const isWinner = turn !== playerColor;
         return {
           title: isWinner ? "You won!" : "You lost",
           message: isWinner
@@ -22,6 +27,14 @@ function GameEndModal({ result, playerColor, onClose }: GameEndModalProps) {
           bgColor: isWinner ? "bg-green-100" : "bg-red-100",
           borderColor: isWinner ? "bg-green-400" : "bg-red-400",
           textColor: isWinner ? "text-green-800" : "text-red-800",
+        };
+      case "draw":
+        return {
+          title: "Game drawn",
+          message: "Game ended in a draw",
+          bgColor: "bg-yellow-100",
+          borderColor: "border-yellow-400",
+          textColor: "text-yellow-800",
         };
       default:
         return {

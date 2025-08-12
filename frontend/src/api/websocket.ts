@@ -37,6 +37,7 @@ function useWebSocket(url: string, onMessage: (msg: Message) => void) {
 
     ws.current.onerror = (err) => {
       console.error("WebSocket error", err);
+      ws.current?.close();
     };
 
     ws.current.onmessage = (e) => {

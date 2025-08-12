@@ -81,7 +81,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(data.access_token);
     localStorage.setItem("accessToken", data.access_token);
 
-    navigate("/");
+    navigate("/login");
   };
 
   const logout = () => {

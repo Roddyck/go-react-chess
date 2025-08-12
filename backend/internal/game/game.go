@@ -10,9 +10,10 @@ import (
 type GameStatus string
 
 const (
-	active         GameStatus = "active"
-	blackCheckmate GameStatus = "black_checkmate"
-	whiteCheckmate GameStatus = "white_checkmate"
+	Active         GameStatus = "active"
+	BlackCheckmate GameStatus = "black_checkmate"
+	WhiteCheckmate GameStatus = "white_checkmate"
+	Stalemate      GameStatus = "stalemate"
 )
 
 type Game struct {
@@ -32,7 +33,7 @@ func NewGame() *Game {
 		History:        []*Move{},
 		Players:        make(map[Color]uuid.UUID),
 		KingsPositions: [2]*Position{},
-		Status:         active,
+		Status:         Active,
 	}
 
 	game.initBoard()
@@ -117,6 +118,53 @@ func (g *Game) kingInCheck() bool {
 	}
 
 	return false
+}
+
+func (g *Game) isStalemate() bool {
+	if g.kingInCheck() {
+		return false
+	}
+
+	for i := range 8 {
+		for j := range 8 {
+			square := &Position{X: j, Y: i}
+			piece := g.Board[i][j]
+
+			if piece == nil {
+				continue
+			}
+
+			if piece.GetColor() != g.Turn {
+				continue
+			}
+
+			for y := range 8 {
+				for x := range 8 {
+					if err := piece.CheckLegalMove(g, &Move{
+						From: square,
+						To:   &Position{X: x, Y: y},
+					}); err != nil {
+						continue
+					}
+
+					tmpPiece := g.Board[y][x]
+					g.Board[y][x] = piece
+					g.Board[i][j] = nil
+
+					if !g.kingInCheck() {
+						g.Board[i][j] = g.Board[y][x]
+						g.Board[y][x] = tmpPiece
+						return false
+					}
+
+					g.Board[i][j] = g.Board[y][x]
+					g.Board[y][x] = tmpPiece
+				}
+			}
+		}
+	}
+
+	return true
 }
 
 // Some refactoring would be nice
@@ -274,11 +322,13 @@ func (g *Game) checkAndNextTurn() {
 		g.Turn = White
 	}
 
-	if g.kingInCheck() && g.kingInCheckmate() {
+	if g.isStalemate() {
+		g.Status = Stalemate
+	} else if g.kingInCheck() && g.kingInCheckmate() {
 		if g.Turn == White {
-			g.Status = blackCheckmate
+			g.Status = BlackCheckmate
 		} else {
-			g.Status = whiteCheckmate
+			g.Status = WhiteCheckmate
 		}
 	}
 }
