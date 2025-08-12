@@ -127,3 +127,57 @@ func TestCheckmate(t *testing.T) {
 		t.Fatalf("game status is not white checkmate, Status: %s", game.Status)
 	}
 }
+
+func TestStalemate(t *testing.T) {
+	//1. e3 a5
+	//2. Qh5 Ra6
+	//3. Qxa5 h5
+	//4. Qxc7 Rah6
+	//5. h4 f6
+	//6. Qxd7+ Kf7
+	//7. Qxb7 Qd3
+	//8. Qxb8 Qh7
+	//9. Qxc8 Kg6
+	//10. Qe6
+
+	// this is fucking pain to write
+	moves := []*Move{
+		{From: &Position{X: 4, Y: 6}, To: &Position{X: 4, Y: 5}},
+		{From: &Position{X: 0, Y: 1}, To: &Position{X: 0, Y: 3}},
+
+		{From: &Position{X: 3, Y: 7}, To: &Position{X: 7, Y: 3}},
+		{From: &Position{X: 0, Y: 0}, To: &Position{X: 0, Y: 2}},
+
+		{From: &Position{X: 7, Y: 3}, To: &Position{X: 0, Y: 3}},
+		{From: &Position{X: 7, Y: 1}, To: &Position{X: 7, Y: 3}},
+
+		{From: &Position{X: 0, Y: 3}, To: &Position{X: 2, Y: 1}},
+		{From: &Position{X: 0, Y: 2}, To: &Position{X: 7, Y: 2}},
+
+		{From: &Position{X: 7, Y: 6}, To: &Position{X: 7, Y: 4}},
+		{From: &Position{X: 5, Y: 1}, To: &Position{X: 5, Y: 2}},
+
+		{From: &Position{X: 2, Y: 1}, To: &Position{X: 3, Y: 1}},
+		{From: &Position{X: 4, Y: 0}, To: &Position{X: 5, Y: 1}},
+
+		{From: &Position{X: 3, Y: 1}, To: &Position{X: 1, Y: 1}},
+		{From: &Position{X: 3, Y: 0}, To: &Position{X: 3, Y: 5}},
+
+		{From: &Position{X: 1, Y: 1}, To: &Position{X: 1, Y: 0}},
+		{From: &Position{X: 3, Y: 5}, To: &Position{X: 7, Y: 1}},
+
+		{From: &Position{X: 1, Y: 0}, To: &Position{X: 2, Y: 0}},
+		{From: &Position{X: 5, Y: 1}, To: &Position{X: 6, Y: 2}},
+
+		{From: &Position{X: 2, Y: 0}, To: &Position{X: 4, Y: 2}},
+	}
+
+	game, err := setupGame(moves, t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if game.Status != Stalemate {
+		t.Fatalf("game status is not stalemate, Status: %s", game.Status)
+	}
+}
