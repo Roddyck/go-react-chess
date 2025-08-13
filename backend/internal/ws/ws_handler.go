@@ -30,7 +30,8 @@ var upgrader = websocket.Upgrader{
 
 func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		ID uuid.UUID `json:"id"`
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 	}
 
 	params := parameters{}
@@ -42,7 +43,7 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 
 	userID := r.Context().Value("userID").(uuid.UUID)
 
-	session := InitSession(params.ID)
+	session := InitSession(params.ID, params.Name)
 	h.hub.Sessions[params.ID] = session
 	session.Game.Players[game.White] = userID
 
@@ -77,6 +78,7 @@ func (h *Handler) CreateSession(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 	type responseParams struct {
 		SessionID string        `json:"session_id"`
+		Name      string        `json:"name"`
 		GameID    string        `json:"game_id"`
 		Status    SessionStatus `json:"status"`
 	}
@@ -86,6 +88,7 @@ func (h *Handler) GetSessions(w http.ResponseWriter, r *http.Request) {
 	for sessionID, session := range sessions {
 		response = append(response, responseParams{
 			SessionID: sessionID.String(),
+			Name:      session.Name,
 			GameID:    session.Game.ID.String(),
 			Status:    session.Status,
 		})

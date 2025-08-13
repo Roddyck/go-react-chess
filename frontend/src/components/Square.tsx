@@ -9,7 +9,13 @@ interface SquareProps {
   onClick: (pos: Position) => void;
 }
 
-function Square({ piece, position, isLight, isSelected, onClick }: SquareProps) {
+function Square({
+  piece,
+  position,
+  isLight,
+  isSelected,
+  onClick,
+}: SquareProps) {
   const getFile = (x: number) => String.fromCharCode(97 + x);
   const getRank = (y: number) => 8 - y;
 
@@ -20,7 +26,7 @@ function Square({ piece, position, isLight, isSelected, onClick }: SquareProps) 
 
   const handleClick = () => {
     onClick(position);
-  }
+  };
 
   return (
     <div
@@ -45,10 +51,7 @@ function Square({ piece, position, isLight, isSelected, onClick }: SquareProps) 
 
       {piece && (
         <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
-          <PieceSVG
-            type={piece.type}
-            color={piece.color}
-          />
+          <PieceSVG type={piece.type} color={piece.color} />
         </div>
       )}
     </div>

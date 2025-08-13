@@ -5,7 +5,10 @@ function Navbar() {
 
   return (
     <div className="flex justify-between items-center bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold cursor-pointer" onClick={() => window.location.href = "/"}>
+      <h1
+        className="text-3xl font-bold cursor-pointer"
+        onClick={() => (window.location.href = "/")}
+      >
         GRChess
       </h1>
       {isAuthenticated ? (

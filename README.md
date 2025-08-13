@@ -34,7 +34,9 @@ TOKEN_SECRET=your-jwt-secret
 
 Start docker containers with docker compose
 ```bash
-docker compose up --build
+# build only first time, btw
+docker compose build
+docker compose up
 ```
 
 ## Development

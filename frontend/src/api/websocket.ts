@@ -4,7 +4,7 @@ type Message = {
   action: string;
   session_id: string;
   data: any;
-}
+};
 
 function useWebSocket(url: string, onMessage: (msg: Message) => void) {
   const ws = useRef<WebSocket | null>(null);

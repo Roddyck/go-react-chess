@@ -20,7 +20,10 @@ function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center justify-center"
+      >
         <h1 className="text-3xl font-bold mb-4">Login</h1>
         <input
           className="mb-4 rounded-lg border-2 border-gray-500 px-4 py-2"

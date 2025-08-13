@@ -11,17 +11,17 @@ export type PieceType =
 export type Piece = {
   type: PieceType;
   color: Color;
-}
+};
 
 export type Position = {
   x: number;
   y: number;
-}
+};
 
 export type Move = {
   from: Position;
   to: Position;
-}
+};
 
 export type Game = {
   ID: string;
@@ -31,4 +31,4 @@ export type Game = {
     [key in Color]: string;
   };
   status: string;
-}
+};

@@ -19,6 +19,7 @@ type Session struct {
 	Players map[uuid.UUID]*Player
 	Game    *game.Game
 	Status  SessionStatus
+	Name    string
 }
 
 type Hub struct {
@@ -29,12 +30,13 @@ type Hub struct {
 	db         *database.Queries
 }
 
-func InitSession(sessionID uuid.UUID) *Session {
+func InitSession(sessionID uuid.UUID, name string) *Session {
 	return &Session{
 		ID:      sessionID,
 		Players: make(map[uuid.UUID]*Player),
 		Game:    game.NewGame(),
 		Status:  active,
+		Name:    name,
 	}
 }
 

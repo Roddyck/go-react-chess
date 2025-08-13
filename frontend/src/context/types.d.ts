@@ -5,7 +5,7 @@ export type User = {
   created_at: string;
   updated_at: string;
   access_token: string;
-}
+};
 
 export type AuthContextType = {
   user: User | null;
@@ -14,4 +14,4 @@ export type AuthContextType = {
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
-}
+};
