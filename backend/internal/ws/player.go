@@ -1,11 +1,14 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
+	"log"
+
+	"github.com/Roddyck/go-react-chess/internal/database"
 	"github.com/Roddyck/go-react-chess/internal/game"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"log"
 )
 
 type Player struct {
@@ -97,6 +100,30 @@ func handleMessage(msg Message, hub *Hub) {
 			},
 		}
 		hub.Broadcast <- message
+
+		if session.Game.Status != game.Active {
+			handleGameEnd(msg.SessionID, hub)
+		}
+	case "draw_offer":
+		hub.Broadcast <- &Message{
+			Action:    "draw_offer",
+			SessionID: msg.SessionID,
+			Data: map[string]any{
+				"user_id": msg.Data["user_id"],
+			},
+		}
+	case "draw_accept":
+		session := hub.Sessions[msg.SessionID]
+		session.Game.Status = game.Draw
+		hub.Broadcast <- &Message{
+			Action:    "draw_accept",
+			SessionID: msg.SessionID,
+			Data: map[string]any{
+				"user_id": msg.Data["user_id"],
+				"game":    session.Game,
+			},
+		}
+		handleGameEnd(msg.SessionID, hub)
 	default:
 	}
 }
@@ -117,4 +144,40 @@ func parseMove(msg Message, move *game.Move) {
 	}
 	move.From = posFrom
 	move.To = posTo
+}
+
+func handleGameEnd(sessionID uuid.UUID, hub *Hub) {
+	if session, ok := hub.Sessions[sessionID]; ok {
+		session.Status = ended
+
+		board, err := json.Marshal(session.Game.Board)
+		if err != nil {
+			log.Println("error marshalling board", err)
+		}
+		history, err := json.Marshal(session.Game.History)
+		if err != nil {
+			log.Println("error marshalling history", err)
+		}
+		players, err := json.Marshal(session.Game.Players)
+		if err != nil {
+			log.Println("error marshalling players", err)
+		}
+
+		ctx := context.Background()
+		err = hub.db.UpdateGame(ctx, database.UpdateGameParams{
+			ID:      session.Game.ID,
+			Board:   board,
+			Turn:    string(session.Game.Turn),
+			History: history,
+			Players: players,
+		})
+		if err != nil {
+			log.Println("error updating game", err)
+		}
+
+		for _, player := range session.Players {
+			hub.Unregister <- player
+		}
+		delete(hub.Sessions, sessionID)
+	}
 }

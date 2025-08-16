@@ -15,6 +15,7 @@ function GamePage() {
   const { sessionID } = useParams<{ sessionID: string }>();
   const [gameID, setGameID] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
+  const [isDrawOffer, setIsDrawOffer] = useState(false);
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ function GamePage() {
 
       if (msg.data.game.status != "active") {
         setShowModal(true);
+      }
+      if (msg.action === "draw_offer" && msg.data.user_id !== user?.id) {
+        setIsDrawOffer(true);
       }
     }
   );
@@ -77,6 +81,25 @@ function GamePage() {
     navigate("/");
   };
 
+  const handleDrawOffer = () => {
+    sendMessage(
+      JSON.stringify({
+        action: "draw_offer",
+        session_id: sessionID,
+        data: { user_id: user?.id },
+      })
+    );
+  };
+
+  const handleAcceptDraw = () => {
+    sendMessage(
+      JSON.stringify({
+        action: "draw_accept",
+        session_id: sessionID,
+      })
+    );
+  };
+
   if (!game) return <div>WTF...</div>;
 
   return (
@@ -87,6 +110,23 @@ function GamePage() {
           playerColor={getPlayerColor()}
           onMove={handleMove}
         />
+      </div>
+      <div className="bg-gray-900 text-white p-4 flex flex-col items-center justify-center">
+        {isDrawOffer ? (
+          <button
+            className="bg-blue-900 text-white p-2 rounded-md border-2 border-blue-500 hover:bg-blue-700"
+            onClick={handleAcceptDraw}
+          >
+            Accept Draw
+          </button>
+        ) : (
+          <button
+            className="bg-blue-900 text-white p-2 rounded-md border-2 border-blue-500 hover:bg-blue-700"
+            onClick={handleDrawOffer}
+          >
+            Offer Draw
+          </button>
+        )}
       </div>
       {showModal && game.status && (
         <GameEndModal

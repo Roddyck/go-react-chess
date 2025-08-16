@@ -14,6 +14,7 @@ const (
 	BlackCheckmate GameStatus = "black_checkmate"
 	WhiteCheckmate GameStatus = "white_checkmate"
 	Stalemate      GameStatus = "stalemate"
+	Draw           GameStatus = "draw"
 )
 
 type Game struct {

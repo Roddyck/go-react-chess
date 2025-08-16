@@ -9,3 +9,11 @@ RETURNING *;
 -- name: GetGameByID :one
 SELECT * FROM games
 WHERE id = $1;
+
+-- name: UpdateGame :exec
+UPDATE games
+    SET board = $2,
+    turn = $3,
+    history = $4,
+    players = $5
+WHERE id = $1;

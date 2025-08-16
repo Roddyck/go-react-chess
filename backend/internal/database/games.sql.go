@@ -63,3 +63,31 @@ func (q *Queries) GetGameByID(ctx context.Context, id uuid.UUID) (Game, error) {
 	)
 	return i, err
 }
+
+const updateGame = `-- name: UpdateGame :exec
+UPDATE games
+    SET board = $2,
+    turn = $3,
+    history = $4,
+    players = $5
+WHERE id = $1
+`
+
+type UpdateGameParams struct {
+	ID      uuid.UUID
+	Board   json.RawMessage
+	Turn    string
+	History json.RawMessage
+	Players json.RawMessage
+}
+
+func (q *Queries) UpdateGame(ctx context.Context, arg UpdateGameParams) error {
+	_, err := q.db.ExecContext(ctx, updateGame,
+		arg.ID,
+		arg.Board,
+		arg.Turn,
+		arg.History,
+		arg.Players,
+	)
+	return err
+}
