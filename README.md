@@ -86,4 +86,3 @@ npm run dev
 * `POST /ws/sessions`: To create session, game created automaticly (requires authenticated users)
 * `GET /ws/sessions`: To get all active sessions
 * `/ws/sessions/{roomID}`: To join session
-
